@@ -1,0 +1,59 @@
+name: Pull Request Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+
+  accounts-build:
+    name: Build Accounts Service
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: accounts
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Build Accounts Service
+        run: mvn --batch-mode clean package -DskipTests
+
+  payment-build:
+    name: Build Payment Service
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: payment
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Build Payment Service
+        run: mvn --batch-mode clean package -DskipTests
