@@ -18,5 +18,4 @@ CONSTRAINT fk_account FOREIGN KEY (account_id) REFERENCES accounts(id));
 
 CREATE INDEX idx_account_id ON ledger_entries(account_id);
 CREATE INDEX idx_transaction_id ON ledger_entries(transaction_id);
-CREATE UNIQUE INDEX uk_reference_id ON ledger_entries(reference_id);
 CREATE UNIQUE INDEX uk_reference_account ON ledger_entries(reference_id, account_id);

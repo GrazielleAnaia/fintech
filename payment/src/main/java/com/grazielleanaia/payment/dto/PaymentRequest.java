@@ -9,15 +9,17 @@ public class PaymentRequest {
     private UUID toAccountId;
     private BigDecimal amount;
     private UUID referenceId; // idempotency key
+//    private UUID transactionId;
 
     public PaymentRequest() {
     }
 
-    public PaymentRequest(UUID referenceId, BigDecimal amount, UUID toAccountId, UUID fromAccountId) {
-        this.referenceId = referenceId;
-        this.amount = amount;
-        this.toAccountId = toAccountId;
+    public PaymentRequest(UUID fromAccountId, UUID toAccountId, BigDecimal amount, UUID referenceId, UUID transactionId) {
         this.fromAccountId = fromAccountId;
+        this.toAccountId = toAccountId;
+        this.amount = amount;
+        this.referenceId = referenceId;
+//        this.transactionId = transactionId;
     }
 
     public UUID getFromAccountId() {
@@ -51,4 +53,12 @@ public class PaymentRequest {
     public void setReferenceId(UUID referenceId) {
         this.referenceId = referenceId;
     }
+
+//    public UUID getTransactionId() {
+//        return transactionId;
+//    }
+//
+//    public void setTransactionId(UUID transactionId) {
+//        this.transactionId = transactionId;
+//    }
 }

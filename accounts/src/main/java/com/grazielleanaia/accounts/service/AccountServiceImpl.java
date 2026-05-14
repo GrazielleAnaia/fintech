@@ -11,6 +11,9 @@ import com.grazielleanaia.accounts.repository.AccountRepository;
 import com.grazielleanaia.accounts.repository.LedgerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,8 @@ public class AccountServiceImpl implements AccountService {
         this.ledgerRepository = ledgerRepository;
     }
 
+    @Caching(evict = {@CacheEvict(value = "balances", key = "#transferRequest.fromAccountId"),
+            @CacheEvict(value = "balances", key = "#transferRequest.toAccountId")})
     @Override
     public void transfer(AccountTransferRequest transferRequest) {
 
@@ -43,7 +48,6 @@ public class AccountServiceImpl implements AccountService {
         Account to = accountRepository.findById(transferRequest.getToAccountId()).orElseThrow(() ->
                 new RuntimeException("To account not found"));
 
-
         if (transferRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
@@ -53,6 +57,7 @@ public class AccountServiceImpl implements AccountService {
         if (balance.compareTo(transferRequest.getAmount()) < 0) {
             throw new RuntimeException("Insufficient funds");
         }
+
         logger.info("Transfer from {} to {}", from.getId(), to.getId());
 
         Ledger debit = new Ledger();
@@ -107,7 +112,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     //Balance=∑Credits−∑Debits
+    @Cacheable(value = "balances", key = "#accountId")
     public BigDecimal calculateBalance(UUID accountId) {
+        logger.info("Calculating balance from DB for account {}", accountId);
         BigDecimal credits = ledgerRepository.sumByAccountAndType(accountId, LedgerTypeEnum.CREDIT);
         BigDecimal debits = ledgerRepository.sumByAccountAndType(accountId, LedgerTypeEnum.DEBIT);
         return credits.subtract(debits);

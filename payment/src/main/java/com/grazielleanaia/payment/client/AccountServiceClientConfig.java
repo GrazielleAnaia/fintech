@@ -15,7 +15,7 @@ public class AccountServiceClientConfig {
 
     @Bean
     public HttpAccountClient httpAccountClient(WebClient.Builder webClientBuilder) {
-
+        logger.info("httpAccountClient");
         WebClient webClient = webClientBuilder
                 .baseUrl("http://localhost:8081")
                 .build();
