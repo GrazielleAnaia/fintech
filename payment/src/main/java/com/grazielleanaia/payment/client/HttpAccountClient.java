@@ -8,9 +8,9 @@ import org.springframework.web.service.annotation.PostExchange;
 
 //Http Interface with WebClient
 
-@HttpExchange("/api/v1")
+@HttpExchange("/api/v1/accounts")
 public interface HttpAccountClient {
 
-    @PostExchange("/accounts/transfer")
+    @PostExchange("/transfer")
     void transfer(@RequestBody AccountTransferRequest request);
 }

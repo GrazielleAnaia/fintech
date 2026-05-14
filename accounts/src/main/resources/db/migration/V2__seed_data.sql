@@ -8,7 +8,7 @@ INSERT INTO ledger_entries(
                            id, account_id, transaction_id, reference_id, amount, ledger_type, created_at)
     VALUES('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
            '11111111-1111-1111-1111-111111111111',
-           'bbbbbbb1-bbbb-bbbb-bbbb-bbbbbbbbbbb1',
+           'fd319d62-3c1f-42cc-b2e0-634a6f40eb46',
            'ccccccc1-cccc-cccc-cccc-ccccccccccc1',
            1000.00,
            'CREDIT',
