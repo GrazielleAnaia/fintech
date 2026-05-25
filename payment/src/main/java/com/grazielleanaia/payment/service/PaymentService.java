@@ -37,8 +37,7 @@ public class PaymentService {
                                 return createPendingTransaction(request);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
-                            }
-                        });
+                            }});
 
         //if already processed, return complete
         if (existingTx.getStatus() == TransactionStatusEnum.COMPLETED) {
@@ -53,7 +52,10 @@ public class PaymentService {
             httpAccountClient.transfer(new AccountTransferRequest(
                     request.getFromAccountId(),
                     request.getToAccountId(),
-                    request.getAmount()));
+                    request.getAmount(),
+                    existingTx.getId(),
+                    request.getReferenceId()
+                    ));
             existingTx.setStatus(TransactionStatusEnum.COMPLETED);
             transactionRepository.save(existingTx);
 
@@ -66,18 +68,16 @@ public class PaymentService {
             transactionRepository.save(existingTx);
             throw new RuntimeException("Payment failed", ex);
         }
-
         return existingTx;
-
     }
 
     private Transactions createPendingTransaction(PaymentRequest request) throws Exception {
         try {
-            Transactions tx = new Transactions();
-            tx.setReferenceId(request.getReferenceId());
-            tx.setStatus(TransactionStatusEnum.PENDING);
-            tx.setType(TransactionTypeEnum.PAYMENT);
-            return transactionRepository.save(tx);
+            Transactions transaction = new Transactions();
+            transaction.setReferenceId(request.getReferenceId());
+            transaction.setStatus(TransactionStatusEnum.PENDING);
+            transaction.setType(TransactionTypeEnum.PAYMENT);
+            return transactionRepository.save(transaction);
         } catch (Exception ex) {
             return transactionRepository
                     .findByReferenceId(request.getReferenceId())

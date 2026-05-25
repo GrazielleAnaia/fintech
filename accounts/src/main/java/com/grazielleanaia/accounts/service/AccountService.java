@@ -6,6 +6,9 @@ import com.grazielleanaia.accounts.dto.DepositRequest;
 import com.grazielleanaia.accounts.entity.Account;
 import com.grazielleanaia.accounts.entity.Ledger;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 public interface AccountService {
 
     void transfer(AccountTransferRequest transferRequest);
@@ -13,4 +16,6 @@ public interface AccountService {
     Account createAccount(CreateAccountRequest request);
 
     void createDeposit(DepositRequest depositRequest);
+
+    BigDecimal calculateBalance(UUID accountId);
 }

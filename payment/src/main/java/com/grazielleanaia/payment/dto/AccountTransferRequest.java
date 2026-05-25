@@ -13,7 +13,7 @@ public class AccountTransferRequest {
     private UUID transactionId;
 
 
-    public AccountTransferRequest() {
+    public AccountTransferRequest(UUID fromAccountId, UUID toAccountId, BigDecimal amount, UUID referenceId) {
     }
 
     public AccountTransferRequest(UUID fromAccountId, UUID toAccountId, BigDecimal amount, UUID referenceId, UUID transactionId) {
@@ -24,8 +24,6 @@ public class AccountTransferRequest {
         this.transactionId = transactionId;
     }
 
-    public AccountTransferRequest(UUID fromAccountId, UUID toAccountId, BigDecimal amount) {
-    }
 
     public UUID getFromAccountId() {
         return fromAccountId;

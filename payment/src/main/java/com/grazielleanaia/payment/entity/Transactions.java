@@ -1,6 +1,5 @@
 package com.grazielleanaia.payment.entity;
 
-
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -10,9 +9,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "transactions",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_reference_id", columnNames = "reference_id")
-        })
-
+                @UniqueConstraint(name = "uk_reference_id", columnNames = "reference_id")})
+//One client request must create only one transaction
 public class Transactions {
 
     @Id
@@ -27,7 +25,7 @@ public class Transactions {
     @Column(nullable = false)
     private TransactionTypeEnum type;
 
-    @Column(name = "reference_id", unique = true, nullable = false)
+    @Column(name = "reference_id", nullable = false)
     private UUID referenceId; //idempotency key (external-safe, globally unique)
 
     @CreationTimestamp
