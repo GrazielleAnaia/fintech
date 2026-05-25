@@ -35,8 +35,6 @@ public class RedisConfig {
                         .fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(new JacksonJsonRedisSerializer<>(BigDecimal.class)));
-
         return RedisCacheManager.builder(connectionFactory).cacheDefaults(config).build();
     }
-
 }

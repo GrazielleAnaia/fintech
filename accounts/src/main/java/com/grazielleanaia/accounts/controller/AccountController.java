@@ -8,10 +8,10 @@ import com.grazielleanaia.accounts.entity.Account;
 import com.grazielleanaia.accounts.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -40,5 +40,10 @@ public class AccountController {
     public ResponseEntity<Void> deposit(@RequestBody DepositRequest depositRequest) {
         accountService.createDeposit(depositRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{accountId}/balance")
+    public ResponseEntity<BigDecimal> getBalance(@PathVariable UUID accountId) {
+        return ResponseEntity.ok(accountService.calculateBalance(accountId));
     }
 }

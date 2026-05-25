@@ -117,6 +117,8 @@ public class AccountServiceImpl implements AccountService {
         logger.info("Calculating balance from DB for account {}", accountId);
         BigDecimal credits = ledgerRepository.sumByAccountAndType(accountId, LedgerTypeEnum.CREDIT);
         BigDecimal debits = ledgerRepository.sumByAccountAndType(accountId, LedgerTypeEnum.DEBIT);
+        logger.info("Credited Account Balance: {}", credits);
+        logger.info("Debited Account Balance: {}", debits);
         return credits.subtract(debits);
     }
 }
