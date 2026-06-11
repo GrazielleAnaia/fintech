@@ -3,6 +3,7 @@ package com.grazielleanaia.payment.service;
 
 import com.grazielleanaia.payment.client.HttpAccountClient;
 import com.grazielleanaia.payment.dto.AccountTransferRequest;
+import com.grazielleanaia.payment.dto.PaymentCreatedEvent;
 import com.grazielleanaia.payment.dto.PaymentRequest;
 import com.grazielleanaia.payment.entity.TransactionStatusEnum;
 import com.grazielleanaia.payment.entity.TransactionTypeEnum;
@@ -10,6 +11,7 @@ import com.grazielleanaia.payment.entity.Transactions;
 import com.grazielleanaia.payment.repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,17 +20,19 @@ public class PaymentService {
     private final Logger log = LoggerFactory.getLogger(PaymentService.class);
     private final TransactionRepository transactionRepository;
     private final HttpAccountClient httpAccountClient;
+    private final KafkaTemplate<String, PaymentCreatedEvent> kafkaTemplate;
 
 
-    public PaymentService(TransactionRepository transactionRepository, HttpAccountClient httpAccountClient) {
+    public PaymentService(TransactionRepository transactionRepository, HttpAccountClient httpAccountClient,
+                          KafkaTemplate<String, PaymentCreatedEvent> kafkaTemplate) {
         this.transactionRepository = transactionRepository;
         this.httpAccountClient = httpAccountClient;
+        this.kafkaTemplate = kafkaTemplate;
     }
-
 
     public Transactions processPayment(PaymentRequest request) {
 
-        //1. Idempotency DB-enforced
+        //Idempotency DB-enforced
         log.info("Idempotency DB-enforced");
         Transactions existingTx =
                 transactionRepository.findByReferenceId(request.getReferenceId())
@@ -37,25 +41,34 @@ public class PaymentService {
                                 return createPendingTransaction(request);
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
-                            }});
+                            }
+                        });
 
-        //if already processed, return complete
+        //If already processed, return complete
         if (existingTx.getStatus() == TransactionStatusEnum.COMPLETED) {
             log.info("Payment has been completed, reference-id = {}", request.getReferenceId());
-
             return existingTx;
         }
 
-        //HttpInterface with WebClient
+
         try {
             log.info("Calling AccountService for transfer, transferId={}", existingTx.getReferenceId());
+
+            //Messaging with Kafka
+            PaymentCreatedEvent createdEvent = new PaymentCreatedEvent(existingTx.getId(),
+                    request.getReferenceId(), request.getFromAccountId(), request.getToAccountId(),
+                    request.getAmount());
+            kafkaTemplate.send("payment-created-topic", createdEvent);
+
+
+            //HttpInterface with WebClient
             httpAccountClient.transfer(new AccountTransferRequest(
                     request.getFromAccountId(),
                     request.getToAccountId(),
                     request.getAmount(),
                     existingTx.getId(),
                     request.getReferenceId()
-                    ));
+            ));
             existingTx.setStatus(TransactionStatusEnum.COMPLETED);
             transactionRepository.save(existingTx);
 
