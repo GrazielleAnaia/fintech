@@ -76,6 +76,7 @@ public class AccountServiceImpl implements AccountService {
 
         ledgerRepository.save(credit);
         ledgerRepository.save(debit);
+
     }
 
     @Override
@@ -122,3 +123,4 @@ public class AccountServiceImpl implements AccountService {
         return credits.subtract(debits);
     }
 }
+

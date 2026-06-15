@@ -3,8 +3,13 @@ package com.grazielleanaia.accounts.service;
 import com.grazielleanaia.accounts.dto.AccountTransferRequest;
 import com.grazielleanaia.accounts.dto.CreateAccountRequest;
 import com.grazielleanaia.accounts.dto.DepositRequest;
+import com.grazielleanaia.accounts.dto.PaymentCreatedEvent;
 import com.grazielleanaia.accounts.entity.Account;
 import com.grazielleanaia.accounts.entity.Ledger;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 
 import java.math.BigDecimal;
 import java.util.UUID;

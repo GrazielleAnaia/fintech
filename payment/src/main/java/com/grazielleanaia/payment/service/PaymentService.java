@@ -8,6 +8,7 @@ import com.grazielleanaia.payment.entity.TransactionStatusEnum;
 import com.grazielleanaia.payment.entity.TransactionTypeEnum;
 import com.grazielleanaia.payment.entity.Transactions;
 import com.grazielleanaia.payment.repository.TransactionRepository;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -46,9 +47,11 @@ public class PaymentService {
         PaymentCreatedEvent createdEvent = new PaymentCreatedEvent(existingTx.getId(),
                 request.getReferenceId(), request.getFromAccountId(), request.getToAccountId(),
                 request.getAmount());
-        kafkaTemplate.send("payment-created-topic", createdEvent);
-
-        existingTx.setStatus(TransactionStatusEnum.COMPLETED);
+        ProducerRecord<String, PaymentCreatedEvent> record = new ProducerRecord<>(
+                "payment-created-topic", createdEvent);
+        record.headers().add("referenceId", createdEvent.referenceId().toString().getBytes());
+        record.headers().add("transactionId", createdEvent.transactionId().toString().getBytes());
+        kafkaTemplate.send(record);
 
         return existingTx;
     }
