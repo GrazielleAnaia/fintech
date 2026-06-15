@@ -1,13 +1,13 @@
-package com.grazielleanaia.payment.dto;
+package com.grazielleanaia.accounts.dto;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record PaymentCreatedEvent (UUID transactionId,
-                                   UUID referenceId,
-                                   UUID fromAccountId,
-                                   UUID toAccountId,
-                                   BigDecimal amount) {
+public record PaymentCreatedEvent(UUID transactionId,
+                                  UUID referenceId,
+                                  UUID fromAccountId,
+                                  UUID toAccountId,
+                                  BigDecimal amount) {
 
 
     public PaymentCreatedEvent {
