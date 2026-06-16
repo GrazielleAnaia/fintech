@@ -5,24 +5,22 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092,localhost:9094,localhost:9096
     consumer:
+      auto-offset-reset: earliest
       group-id: accounts-group
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+#      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
         spring:
-          deserializer:
-            key:
-              delegate:
-                class: org.apache.kafka.common.serialization.StringDeserializer
-            value:
-              delegate:
-                class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+#          deserializer:
+#            key:
+#              delegate:
+#                class: org.apache.kafka.common.serialization.StringDeserializer
+#            value:
+#              delegate:
+#                class: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
           json:
             trusted:
-              packages: "com.grazielleanaia.accounts.dto"
-            use:
-              type:
-                headers: false
+              packages: com.grazielleanaia.accounts.dto
             value:
               default:
                 type: com.grazielleanaia.accounts.dto.PaymentCreatedEvent

@@ -58,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
             throw new RuntimeException("Insufficient funds");
         }
 
-        logger.info("Transfer from {} to {}", from.getId(), to.getId());
+        logger.info("Transferring from {} to {}", from.getId(), to.getId());
 
         Ledger debit = new Ledger();
         debit.setAccountId(from.getId());
@@ -118,6 +118,10 @@ public class AccountServiceImpl implements AccountService {
         logger.info("Calculating balance from DB for account {}", accountId);
         BigDecimal credits = ledgerRepository.sumByAccountAndType(accountId, LedgerTypeEnum.CREDIT);
         BigDecimal debits = ledgerRepository.sumByAccountAndType(accountId, LedgerTypeEnum.DEBIT);
+
+        credits = credits != null ? credits : BigDecimal.ZERO;
+        debits = debits != null ? debits : BigDecimal.ZERO;
+
         logger.info("Credited Account Balance: {}", credits);
         logger.info("Debited Account Balance: {}", debits);
         return credits.subtract(debits);
