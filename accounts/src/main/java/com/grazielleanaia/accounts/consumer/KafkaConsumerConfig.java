@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -17,6 +18,7 @@ import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 
+@EnableKafka
 @Configuration
 public class KafkaConsumerConfig {
 
@@ -38,10 +40,10 @@ public class KafkaConsumerConfig {
 
         props.put(JacksonJsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
-        props.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE,
-                "com.grazielleanaia.accounts.dto.PaymentCreatedEvent");
+        props.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, environment.getProperty("spring.kafka.consumer.properties.spring.json.value.default.type"));
 
-        props.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, "com.grazielleanaia.accounts.dto");
+        props.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, environment.getProperty("spring.kafka.consumer.properties.spring.json.trusted.packages"));
+
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
