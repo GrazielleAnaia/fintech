@@ -39,7 +39,7 @@ public class AccountServiceImpl implements AccountService {
 
         //Idempotency check
         if (ledgerRepository.existsByReferenceId(transferRequest.getReferenceId())) {
-            logger.info("Duplicate request detected, skipping. refId={}", transferRequest.getReferenceId());
+            logger.info("Duplicate request detected, skipping. referenceId={}", transferRequest.getReferenceId());
             return;
         }
 
