@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class PaymentService {
 
@@ -34,17 +36,17 @@ public class PaymentService {
 
         //Idempotency DB-enforced
         log.info("Idempotency DB-enforced");
-        Transactions existingTx = transactionRepository.findByReferenceId(request.getReferenceId())
-                .orElseGet(() -> createPendingTransaction(request));
+        Optional<Transactions> existingTransaction = transactionRepository.findByReferenceId(request.getReferenceId());
 
-        //If already processed, return complete
-        if (existingTx.getStatus() == TransactionStatusEnum.COMPLETED) {
-            log.info("Payment has been completed, reference-id = {}", request.getReferenceId());
-            return existingTx;
+        if (existingTransaction.isPresent()) {
+            log.info("Payment already exists, referenceId={}", request.getReferenceId());
+            return existingTransaction.get();
         }
 
+        Transactions transaction = createPendingTransaction(request);
+
         //Messaging with Kafka
-        PaymentCreatedEvent createdEvent = new PaymentCreatedEvent(existingTx.getId(),
+        PaymentCreatedEvent createdEvent = new PaymentCreatedEvent(transaction.getId(),
                 request.getReferenceId(), request.getFromAccountId(), request.getToAccountId(),
                 request.getAmount());
         ProducerRecord<String, PaymentCreatedEvent> record = new ProducerRecord<>(
@@ -53,7 +55,7 @@ public class PaymentService {
         record.headers().add("transactionId", createdEvent.transactionId().toString().getBytes());
         kafkaTemplate.send(record);
 
-        return existingTx;
+        return transaction;
     }
 
     //Create DB record, persist transaction as PENDING status
