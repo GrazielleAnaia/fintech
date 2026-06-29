@@ -7,6 +7,17 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
 
+    consumer:
+      group-id: payment-group
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: com.grazielleanaia.payment.dto
+            value:
+              default:
+                type: com.grazielleanaia.payment.dto.PaymentCompletedEvent
+
   datasource:
     url: jdbc:h2:mem:paymentdb
     username: sa

@@ -1,5 +1,17 @@
 services:
 
+  redis:
+    container_name: redis-container
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - kafka-net
+    restart: unless-stopped
+
   kafka-1:
     image: confluentinc/cp-kafka:latest
     ports:
@@ -67,4 +79,5 @@ volumes:
   kafka-1-data:
   kafka-2-data:
   kafka-3-data:
+  redis-data:
 

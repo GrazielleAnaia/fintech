@@ -4,6 +4,7 @@ package com.grazielleanaia.accounts.service;
 import com.grazielleanaia.accounts.dto.AccountTransferRequest;
 import com.grazielleanaia.accounts.dto.CreateAccountRequest;
 import com.grazielleanaia.accounts.dto.DepositRequest;
+import com.grazielleanaia.accounts.dto.PaymentCompletedEvent;
 import com.grazielleanaia.accounts.entity.Account;
 import com.grazielleanaia.accounts.entity.Ledger;
 import com.grazielleanaia.accounts.entity.LedgerTypeEnum;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +28,13 @@ public class AccountServiceImpl implements AccountService {
     private Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountRepository accountRepository;
     private final LedgerRepository ledgerRepository;
+    private final KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate;
 
-    public AccountServiceImpl(AccountRepository accountRepository, LedgerRepository ledgerRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, LedgerRepository ledgerRepository,
+                              KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate) {
         this.accountRepository = accountRepository;
         this.ledgerRepository = ledgerRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Caching(evict = {@CacheEvict(value = "balances", key = "#transferRequest.fromAccountId"),
@@ -44,9 +49,9 @@ public class AccountServiceImpl implements AccountService {
         }
 
         Account from = accountRepository.findById(transferRequest.getFromAccountId()).orElseThrow(() ->
-                new RuntimeException("From account not found"));
+                new RuntimeException("From debit account not found"));
         Account to = accountRepository.findById(transferRequest.getToAccountId()).orElseThrow(() ->
-                new RuntimeException("To account not found"));
+                new RuntimeException("To credit account not found"));
 
         if (transferRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
@@ -76,6 +81,11 @@ public class AccountServiceImpl implements AccountService {
 
         ledgerRepository.save(credit);
         ledgerRepository.save(debit);
+
+        //After ledger_entries succeeds, publish Kafka success event
+        PaymentCompletedEvent completedEvent = new PaymentCompletedEvent(
+                transferRequest.getTransactionId(), transferRequest.getReferenceId());
+        kafkaTemplate.send("payment-completed-topic", completedEvent);
 
     }
 
