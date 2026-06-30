@@ -27,5 +27,4 @@ public class PaymentResultConsumer {
         transaction.setStatus(TransactionStatusEnum.COMPLETED);
         transactionRepository.save(transaction);
     }
-
 }
