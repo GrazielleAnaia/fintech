@@ -5,8 +5,14 @@ import com.grazielleanaia.accounts.dto.PaymentCreatedEvent;
 import com.grazielleanaia.accounts.service.AccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.kafka.annotation.BackOff;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
 
 @Component
 public class PaymentCreatedConsumer {
@@ -18,9 +24,14 @@ public class PaymentCreatedConsumer {
         this.accountService = accountService;
     }
 
+    @RetryableTopic(attempts = "4",
+            include = {SQLException.class, CannotAcquireLockException.class},
+            dltStrategy = DltStrategy.ALWAYS_RETRY_ON_ERROR,
+            backOff = @BackOff (delay = 2000, multiplier = 2))
     @KafkaListener(topics = "payment-created-topic",
             groupId = "accounts-group")
     public void consume(PaymentCreatedEvent event) {
+
         logger.info("Received Payment Event = " +
                 event.referenceId());
 
