@@ -27,7 +27,7 @@ public class PaymentCreatedConsumer {
     @RetryableTopic(attempts = "4",
             include = {SQLException.class, CannotAcquireLockException.class},
             dltStrategy = DltStrategy.ALWAYS_RETRY_ON_ERROR,
-            backOff = @BackOff (delay = 2000, multiplier = 2))
+            backOff = @BackOff (delay = 2000, multiplier = 2)) //some thread must wait
     @KafkaListener(topics = "payment-created-topic",
             groupId = "accounts-group")
     public void consume(PaymentCreatedEvent event) {
