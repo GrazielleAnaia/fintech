@@ -2,6 +2,7 @@ package com.grazielleanaia.payment.producer;
 
 
 import com.grazielleanaia.payment.dto.PaymentCompletedEvent;
+import com.grazielleanaia.payment.dto.PaymentFailedEvent;
 import com.grazielleanaia.payment.entity.TransactionStatusEnum;
 import com.grazielleanaia.payment.entity.Transactions;
 import com.grazielleanaia.payment.repository.TransactionRepository;
@@ -26,5 +27,13 @@ public class PaymentResultConsumer {
         }
         transaction.setStatus(TransactionStatusEnum.COMPLETED);
         transactionRepository.save(transaction);
+    }
+
+    @KafkaListener(topics = "payment-failed-topic")
+    public void consumeFailed(PaymentFailedEvent paymentFailedEvent) {
+        Transactions transaction = transactionRepository.findById(paymentFailedEvent.transactionId())
+                .orElseThrow();
+        transaction.setStatus(TransactionStatusEnum.FAILED);
+
     }
 }
