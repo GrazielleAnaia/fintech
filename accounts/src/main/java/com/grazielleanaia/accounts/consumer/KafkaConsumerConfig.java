@@ -1,7 +1,6 @@
 package com.grazielleanaia.accounts.consumer;
 
 
-import com.grazielleanaia.accounts.dto.PaymentCompletedEvent;
 import com.grazielleanaia.accounts.dto.PaymentCreatedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -33,6 +32,7 @@ public class KafkaConsumerConfig {
     Environment environment;
 
 
+    //Builds kafka consumer
     @Bean
     public ConsumerFactory<String, PaymentCreatedEvent> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -54,6 +54,7 @@ public class KafkaConsumerConfig {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
+    //Creates listener containers - an infinite loop
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, PaymentCreatedEvent> kafkaListenerContainerFactory(ConsumerFactory<String, PaymentCreatedEvent> consumerFactory) {
         ConcurrentKafkaListenerContainerFactory<String, PaymentCreatedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -71,12 +72,12 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    ProducerFactory<String, PaymentCompletedEvent> producerFactory() {
+    ProducerFactory<String, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate() {
+    KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 

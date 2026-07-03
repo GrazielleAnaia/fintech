@@ -33,8 +33,8 @@ public class KafkaProducerConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
-    @Value("${spring.kafka.consumer.properties.spring.json.value.default.type}")
-    private String defaultType;
+//    @Value("${spring.kafka.consumer.properties.spring.json.value.default.type}")
+//    private String defaultType;
 
     @Value("${spring.kafka.consumer.properties.spring.json.trusted.packages}")
     private String trustedPackages;
@@ -82,7 +82,7 @@ public class KafkaProducerConfig {
 
         props.put(JacksonJsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
-        props.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, defaultType);
+//        props.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, defaultType);
 
         props.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, trustedPackages);
 

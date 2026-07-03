@@ -28,10 +28,10 @@ public class AccountServiceImpl implements AccountService {
     private Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
     private final AccountRepository accountRepository;
     private final LedgerRepository ledgerRepository;
-    private final KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public AccountServiceImpl(AccountRepository accountRepository, LedgerRepository ledgerRepository,
-                              KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate) {
+                              KafkaTemplate<String, Object> kafkaTemplate) {
         this.accountRepository = accountRepository;
         this.ledgerRepository = ledgerRepository;
         this.kafkaTemplate = kafkaTemplate;
@@ -42,7 +42,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void transfer(AccountTransferRequest transferRequest) {
 
-        //Idempotency check
+        //Idempotency check. No matter how many times Kafka redelivers the same message
         if (ledgerRepository.existsByReferenceId(transferRequest.getReferenceId())) {
             logger.info("Duplicate request detected, skipping. referenceId={}", transferRequest.getReferenceId());
             return;
