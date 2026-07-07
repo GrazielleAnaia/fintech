@@ -82,7 +82,7 @@ public class AccountServiceImpl implements AccountService {
         ledgerRepository.save(credit);
         ledgerRepository.save(debit);
 
-        //After ledger_entries succeeds, publish Kafka success event
+        //After ledger_entries succeeds, Kafka publishes a success record
         PaymentCompletedEvent completedEvent = new PaymentCompletedEvent(
                 transferRequest.getTransactionId(), transferRequest.getReferenceId());
         kafkaTemplate.send("payment-completed-topic", completedEvent);

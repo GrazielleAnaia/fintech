@@ -80,11 +80,15 @@ public class KafkaProducerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JacksonJsonDeserializer.class);
 
-        props.put(JacksonJsonDeserializer.USE_TYPE_INFO_HEADERS, false);
+        props.put(JacksonJsonDeserializer.USE_TYPE_INFO_HEADERS, true); //True is default
 
 //        props.put(JacksonJsonDeserializer.VALUE_DEFAULT_TYPE, defaultType);
 
         props.put(JacksonJsonDeserializer.TRUSTED_PACKAGES, trustedPackages);
+        props.put(JacksonJsonDeserializer.TYPE_MAPPINGS, """
+                com.grazielleanaia.accounts.dto.PaymentCompletedEvent:
+                com.grazielleanaia.payment.dto.PaymentCompletedEvent
+                """);
 
         return new DefaultKafkaConsumerFactory<>(props);
     }

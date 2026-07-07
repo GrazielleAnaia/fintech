@@ -68,6 +68,7 @@ public class KafkaConsumerConfig {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, environment.getProperty("spring.kafka.bootstrap-servers"));
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonSerializer.class);
+        props.put(JacksonJsonSerializer.ADD_TYPE_INFO_HEADERS, true);
         return props;
     }
 
