@@ -6,23 +6,23 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
-      properties:
-        spring:
-          json:
-            add:
-              type:
-                headers: true
+#      properties:
+#        spring:
+#          json:
+#            add:
+#              type:
+#                headers: true
 
     consumer:
       group-id: payment-group
       properties:
         spring:
           json:
-            add:
-              type:
-                headers: true
+            add.type.headers: true
+#              type:
+#                headers: true
             trusted:
-              packages: com.grazielleanaia.payment.dto
+              packages: com.grazielleanaia.payment.dto,com.grazielleanaia.accounts.dto
 #            value:
 #              default:
 #                type: com.grazielleanaia.payment.dto.PaymentCompletedEvent
