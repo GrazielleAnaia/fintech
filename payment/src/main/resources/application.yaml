@@ -22,7 +22,7 @@ spring:
 #              type:
 #                headers: true
             trusted:
-              packages: com.grazielleanaia.payment.dto,com.grazielleanaia.accounts.dto
+              packages: com.grazielleanaia.accounts.dto
 #            value:
 #              default:
 #                type: com.grazielleanaia.payment.dto.PaymentCompletedEvent
